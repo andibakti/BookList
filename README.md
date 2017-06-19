@@ -1,6 +1,7 @@
 # BookList
 This app displays, for a specified query, a list of books from the Google Books API.
 
+![alt text](https://github.com/andibakti/BookList/blob/master/Book%20list%20-%20search.gif)
 
 ## What does this app accomplish?
 
