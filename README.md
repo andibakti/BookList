@@ -16,6 +16,6 @@ This app displays, for a specified query, a list of books from the Google Books 
 
 ## Acknowledgements
 
-This project was based on the Udacity course [Android Basics: Networking](https://www.udacity.com/course/android-basics-networking--ud843). I highly recommend their website for learning Android.
+This project was based on the Udacity course [Android Basics: Networking](https://www.udacity.com/course/android-basics-networking--ud843). I highly recommend their website for anyone learning Android.
 
 
