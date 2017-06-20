@@ -3,14 +3,18 @@ package com.example.camille.booklist;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         //List<Book> books = QueryUtils.fetchBooks("quilting");
     }
@@ -85,22 +91,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if(books != null && !books.isEmpty()) {
 
-            BookArrayAdapter adapter = new BookArrayAdapter(this, books);
+            final BookArrayAdapter adapter = new BookArrayAdapter(this, books);
             final ListView bookListView = (ListView) findViewById(R.id.books);
 
             bookListView.setAdapter(adapter);
             Log.i(LOG_TAG, "TEST: Updating UI" + books.get(0).getAuthors().toString());
+            //listening for click, which redirects to links for the corresponding view
+            bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                @Override
+                public void onItemClick(AdapterView adapterView, View view, int position, long l){
+                    Book currentBook = adapter.getItem(position);
+                    String url = currentBook.geturlLink();
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+            });
+        }else{
+            //Ask user to perform a search
         }
-    }
-
-
-    @Override
-    public void onOptionsMenuClosed(Menu menu) {
-        super.onOptionsMenuClosed(menu);
-        Log.i(LOG_TAG,"TEST: Options Menu closed, calling loader");
-
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(BOOK_LOADER_ID, null,this);     //force load is already called
     }
 
     //SearchView
@@ -114,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -121,12 +131,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Log.i(LOG_TAG,"TEST: Setting searchRequest to be the query");
                 LoaderManager loaderManager = getLoaderManager();
                 loaderManager.initLoader(BOOK_LOADER_ID, null,MainActivity.this);     //force load is already called
+
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener(){
+            @Override
+            public boolean onClose(){
+                updateUI(Collections.<Book>emptyList());
+                return true;
             }
         });
 
