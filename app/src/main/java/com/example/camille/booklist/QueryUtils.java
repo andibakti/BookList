@@ -100,11 +100,12 @@ public class QueryUtils {
                 Log.i(LOG_TAG, "TEST: authors array created");
                 String[]authors = new String[1];
                 authors[0] = authorsList;
+                String[] newAuthors = authors[0].split(",");
                 Log.i(LOG_TAG, "TEST: Authors created");
 
 
                 //Creating book object
-                Book book = new Book(title, authors,date,urlLink);
+                Book book = new Book(title, newAuthors,date,urlLink);
                 Log.i(LOG_TAG, "TEST: Book object created");
 
                 books.add(book);

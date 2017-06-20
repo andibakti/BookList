@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,12 +36,8 @@ public class BookArrayAdapter extends ArrayAdapter<Book>{
         //TODO: Use switch to determine the Oxford coma
 
         TextView authors = (TextView) convertView.findViewById(R.id.authors);
-        StringBuilder builder = new StringBuilder();
-        for(int i =0; i<book.getAuthors().length; i++){
-            builder.append(book.getAuthors()[i]);
-            builder.append(", ");
-        }
-        authors.setText(builder.toString());
+        String[] newAuthors = Arrays.deepToString(book.getAuthors()).split("\"");
+        authors.setText(newAuthors[1]);
 
         TextView title = (TextView) convertView.findViewById(R.id.title);
         title.setText(book.getTitle());

@@ -41,7 +41,9 @@ public class SearchResultActivity extends Activity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             //TODO: Use the query to search your data somehow
             //      (ie, call the BookLoader)
+            Log.i(LOG_TAG,"TEST: SearchResultActivity created");
             searchRequest = query;
+
 
         }
     }
