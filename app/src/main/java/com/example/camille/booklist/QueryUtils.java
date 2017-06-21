@@ -1,5 +1,8 @@
 package com.example.camille.booklist;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -103,9 +106,18 @@ public class QueryUtils {
                 String[] newAuthors = authors[0].split(",");
                 Log.i(LOG_TAG, "TEST: Authors created");
 
+                /////////////
+                JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
+                String bookCoverLink = imageLinks.getString("smallThumbnail");
+                assert bookCoverLink != null;
+                Bitmap bookCover = getBookCover(bookCoverLink);
+
+                if (bookCover == null) throw new AssertionError("Book Cover cannot be null!");
+                Log.i(LOG_TAG, "TEST: BookCover bitmap created");
+
 
                 //Creating book object
-                Book book = new Book(title, newAuthors,date,urlLink);
+                Book book = new Book(title, newAuthors,date,urlLink, bookCover);
                 Log.i(LOG_TAG, "TEST: Book object created");
 
                 books.add(book);
@@ -117,6 +129,35 @@ public class QueryUtils {
         return books;
     }
 
+    private static Bitmap getBookCover(String url){
+        InputStream input;
+        Bitmap bookCover, bitmap;
+        HttpURLConnection urlConnection = null;
+        URL urlObject = null;
+
+        bookCover = null;
+
+        try{
+            urlObject = new URL(url);
+        }catch (MalformedURLException e){
+            Log.e(LOG_TAG, "Error forming book cover URL");
+        }
+
+        try{
+            urlConnection = (HttpURLConnection) urlObject.openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.connect();
+            input = urlConnection.getInputStream();
+            bitmap = BitmapFactory.decodeStream(input);
+            return bitmap;
+
+
+        }catch (IOException e){
+            Log.e(LOG_TAG,"Error creating book cover image");
+        }
+
+        return bookCover;
+    }
 
     //This method make the HTTP request and returns the raw json from the stream
     private static String makeHTTPRequest(URL url) throws IOException {

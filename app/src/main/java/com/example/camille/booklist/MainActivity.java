@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long l){
                 Book currentBook = mAdapter.getItem(position);
+                assert currentBook != null;
                 String url = currentBook.geturlLink();
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
