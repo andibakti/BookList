@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.Uri;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String LOG_TAG = MainActivity.class.getName();
     protected String searchRequest = null;
     private static final int BOOK_LOADER_ID = 1;
+    private BookArrayAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,33 +92,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
     protected void updateUI(List<Book> books){
+        mAdapter = new BookArrayAdapter(this, books);
+        ListView bookListView = (ListView) findViewById(R.id.books);
 
-        if(books != null && !books.isEmpty()) {
+        bookListView.setAdapter(mAdapter);
 
-            final BookArrayAdapter adapter = new BookArrayAdapter(this, books);
-            final ListView bookListView = (ListView) findViewById(R.id.books);
-
-            bookListView.setAdapter(adapter);
-            Log.i(LOG_TAG, "TEST: Updating UI" + books.get(0).getAuthors().toString());
-            //listening for click, which redirects to links for the corresponding view
-            bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-                @Override
-                public void onItemClick(AdapterView adapterView, View view, int position, long l){
-                    Book currentBook = adapter.getItem(position);
-                    String url = currentBook.geturlLink();
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(url));
-                    startActivity(i);
-                }
-            });
-        }else{
-            //Ask user to perform a search
+        if(books == null || books.isEmpty()) {
+            mAdapter.clear();
         }
+
+
+        Log.i(LOG_TAG, "TEST: Updating UI");
+        //listening for click, which redirects to links for the corresponding view
+        bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView adapterView, View view, int position, long l){
+                Book currentBook = mAdapter.getItem(position);
+                String url = currentBook.geturlLink();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+
+
+            //Ask user to perform a search
+
     }
 
     //SearchView
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
 
@@ -123,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-
+        final MenuItem searchMenu = menu.findItem(R.id.search);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -141,14 +150,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        searchView.setOnCloseListener(new SearchView.OnCloseListener(){
-            @Override
-            public boolean onClose(){
-                updateUI(Collections.<Book>emptyList());
-                return true;
-            }
-        });
+        MenuItemCompat.setOnActionExpandListener(searchMenu,
+                new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                        updateUI(Collections.<Book>emptyList());
+                        return true;
+                    }
 
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                        // Refresh here with full list.
+
+                        return true;
+                    }
+                });
         return true;
     }
 
