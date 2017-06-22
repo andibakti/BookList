@@ -19,8 +19,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,12 +42,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int BOOK_LOADER_ID = 1;
     private BookArrayAdapter mAdapter;
     private LoaderManager loaderManager;
+    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        updateUI(new ArrayList<Book>());
+        emptyView.setText(R.string.start_search);
 
 
         //List<Book> books = QueryUtils.fetchBooks("quilting");
@@ -65,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //Calling the BookLoader constructor, which calls QueryUtils and performs the search
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
         progressBar.setVisibility(View.VISIBLE);
+        emptyView.setText("");
         return new BookLoader(this, searchRequest);
     }
 
@@ -76,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         updateUI(Collections.<Book>emptyList());
         Log.i(LOG_TAG, "TEST: Load Finished");
 
+        emptyView.setText(R.string.empty);
 
         if(books != null && !books.isEmpty()){
             updateUI(books);
@@ -101,12 +108,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter = new BookArrayAdapter(this, books);
         ListView bookListView = (ListView) findViewById(R.id.books);
 
+        emptyView = (TextView) findViewById(R.id.emptyElement);
+
         bookListView.setAdapter(mAdapter);
 
         if(books == null || books.isEmpty()) {
             mAdapter.clear();
         }
 
+        bookListView.setEmptyView(emptyView);
 
         Log.i(LOG_TAG, "TEST: Updating UI");
         //listening for click, which redirects to links for the corresponding view
@@ -160,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 updateUI(Collections.<Book>emptyList());
                 loaderManager = getLoaderManager();
                 loaderManager.destroyLoader(BOOK_LOADER_ID);
+                emptyView.setText("");
                 return true;
             }
         });
@@ -171,12 +182,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         updateUI(Collections.<Book>emptyList());
                         loaderManager = getLoaderManager();
                         loaderManager.destroyLoader(BOOK_LOADER_ID);
+                        emptyView.setText("");
                         return true;
                     }
 
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                         // Refresh here with full list.
+                        emptyView.setText(R.string.start_search);
                         return true;
                     }
                 });

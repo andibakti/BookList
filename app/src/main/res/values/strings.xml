@@ -2,4 +2,6 @@
     <string name="app_name">Book List</string>
     <string name="search">Search for a book</string>
     <string name="search_hint">Look for a book here</string>
+    <string name="empty">No books found</string>
+    <string name="start_search">Start your search here</string>
 </resources>

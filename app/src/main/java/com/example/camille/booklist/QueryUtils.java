@@ -108,7 +108,7 @@ public class QueryUtils {
 
                 /////////////
                 JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
-                String bookCoverLink = imageLinks.getString("smallThumbnail");
+                String bookCoverLink = imageLinks.getString("thumbnail");
                 assert bookCoverLink != null;
                 Bitmap bookCover = getBookCover(bookCoverLink);
 
