@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected String searchRequest = null;
     private static final int BOOK_LOADER_ID = 1;
     private BookArrayAdapter mAdapter;
+    private LoaderManager loaderManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<Book>> onCreateLoader(int id, Bundle bundle){
         //Calling the BookLoader constructor, which calls QueryUtils and performs the search
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
+        progressBar.setVisibility(View.VISIBLE);
         return new BookLoader(this, searchRequest);
     }
 
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<List<Book>> loader){
         //Clear UI
+        //TODO:
         updateUI(Collections.<Book>emptyList());
         Log.i(LOG_TAG, "TEST: Load Reset");
     }
@@ -130,19 +134,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
 
+
+
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         final MenuItem searchMenu = menu.findItem(R.id.search);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchRequest = query;
                 Log.i(LOG_TAG,"TEST: Setting searchRequest to be the query");
 
-                LoaderManager loaderManager = getLoaderManager();
+                loaderManager = getLoaderManager();
                 loaderManager.initLoader(BOOK_LOADER_ID, null,MainActivity.this);
 
                 return true;
@@ -150,7 +157,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                updateUI(Collections.<Book>emptyList());
+                loaderManager = getLoaderManager();
+                loaderManager.destroyLoader(BOOK_LOADER_ID);
+                return true;
             }
         });
 
@@ -159,13 +169,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem menuItem) {
                         updateUI(Collections.<Book>emptyList());
+                        loaderManager = getLoaderManager();
+                        loaderManager.destroyLoader(BOOK_LOADER_ID);
                         return true;
                     }
 
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                         // Refresh here with full list.
-
                         return true;
                     }
                 });
