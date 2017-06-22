@@ -3,7 +3,10 @@ This app displays, for a specified query, a list of books from the Google Books 
 
 ## Demo
 
-![Demo](https://github.com/andibakti/BookList/blob/master/Book%20list%20-%20search.gif)
+<p align="center">
+  <img src="https://github.com/andibakti/BookList/blob/master/Book%20list%20-%20search.gif"/>
+</p>
+
 
 *Example of a search for "The Art Of The Deal" by Donald J. Trump.*
 
