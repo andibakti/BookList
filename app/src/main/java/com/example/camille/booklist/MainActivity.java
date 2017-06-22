@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 
 import java.util.Collections;
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Call the Array Adapter there to update UI
         updateUI(Collections.<Book>emptyList());
         Log.i(LOG_TAG, "TEST: Load Finished");
-        Log.i(LOG_TAG, "TEST: books isEmpty?: " + books.isEmpty());
 
 
         if(books != null && !books.isEmpty()){
@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Log.i(LOG_TAG, "TEST: Load Finished; Updated UI");
         }
 
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_bar);
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -139,8 +141,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public boolean onQueryTextSubmit(String query) {
                 searchRequest = query;
                 Log.i(LOG_TAG,"TEST: Setting searchRequest to be the query");
+
                 LoaderManager loaderManager = getLoaderManager();
-                loaderManager.initLoader(BOOK_LOADER_ID, null,MainActivity.this);     //force load is already called
+                loaderManager.initLoader(BOOK_LOADER_ID, null,MainActivity.this);
 
                 return true;
             }
